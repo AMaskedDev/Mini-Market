@@ -87,7 +87,7 @@ class Main:
         # Time
         self.header_time = customtkinter.CTkLabel(self.header_frame, text="0:00", fg_color="#D2D2D2",
                                                   bg_color="#EEEEEE", text_color='black', font=("calibri", 38))
-        self.header_time.pack(side="right")
+        self.header_time.pack(side="right", pady=(5, 5))
 
         self.application.mainloop()
 
