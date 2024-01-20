@@ -10,7 +10,6 @@ from CTkTable import *
 customtkinter.set_appearance_mode("dark")
 
 
-
 class Main:
     def __init__(self):
         # Initializing the base window
@@ -81,10 +80,13 @@ class Main:
         self.header_time.configure(text=current_time)
         self.header_time.after(1000, self.clock)
 
+
 class Add_Product:
     def __init__(self):
         pass
-    class Add_Product_Gui(self):
+
+    def Add_Product_Gui(self):
         pass
+
 
 Main()
