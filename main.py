@@ -3,6 +3,7 @@ import customtkinter
 from tkinter import messagebox, simpledialog, scrolledtext, ttk
 from tkinter import *
 import json
+import time
 
 
 class Main:
@@ -17,31 +18,31 @@ class Main:
         self.application.resizable(False, False)
 
         # Header toolbar
-        self.header = tkinter.Menu(self.application)
+        # self.header = tkinter.Menu(self.application)
 
-        self.storage_tools = tkinter.Menu(self.header, tearoff=0)
-        self.dangerous_tools = tkinter.Menu(self.header, tearoff=0)
-        self.help_menu = tkinter.Menu(self.header, tearoff=0)
+        # self.storage_tools = tkinter.Menu(self.header, tearoff=0)
+        # self.dangerous_tools = tkinter.Menu(self.header, tearoff=0)
+        # self.help_menu = tkinter.Menu(self.header, tearoff=0)
 
-        # Adding commands to the storage tools
-        self.storage_tools.add_command(label="Add storage product")
-        self.storage_tools.add_command(label="Remove storage product")
-        self.storage_tools.add_command(label="View storage products")
+        ## Adding commands to the storage tools
+        # self.storage_tools.add_command(label="Add storage product")
+        # self.storage_tools.add_command(label="Remove storage product")
+        # self.storage_tools.add_command(label="View storage products")
 
-        # Adding commands to the dangerous tools
-        self.dangerous_tools.add_command(label="Remove all products")
+        ## Adding commands to the dangerous tools
+        # self.dangerous_tools.add_command(label="Remove all products")
 
-        # Adding commands to the help menu
-        self.help_menu.add_command(label="How to add new products")
-        self.help_menu.add_command(label="How to remove products")
-        self.help_menu.add_command(label="How to view all products")
+        ## Adding commands to the help menu
+        # self.help_menu.add_command(label="How to add new products")
+        # self.help_menu.add_command(label="How to remove products")
+        # self.help_menu.add_command(label="How to view all products")
 
-        # Creating the 'rendering' for the toolbar
-        self.header.add_cascade(label="Storage Management", menu=self.storage_tools)
-        self.header.add_cascade(label="Dangerous Tools", menu=self.dangerous_tools)
-        self.header.add_cascade(label="Help", menu=self.help_menu)
+        ## Creating the 'rendering' for the toolbar
+        # self.header.add_cascade(label="Storage Management", menu=self.storage_tools)
+        # self.header.add_cascade(label="Dangerous Tools", menu=self.dangerous_tools)
+        # self.header.add_cascade(label="Help", menu=self.help_menu)
 
-        self.application.config(menu=self.header)
+        # self.application.config(menu=self.header)
 
         # Header Frame
         self.header_frame = customtkinter.CTkFrame(self.application, height=100, fg_color="#D2D2D2", bg_color="#EEEEEE",
@@ -60,7 +61,7 @@ class Main:
         # Format the columns
         self.products_list.column("#0", stretch=False, minwidth=0, width=0)
         self.products_list.column("Amount", anchor=tkinter.W, width=120)
-        self.products_list.column("Product", anchor=tkinter.CENTER, width=200)
+        self.products_list.column("Product", anchor=tkinter.W, width=200)
         self.products_list.column("Cost", anchor=tkinter.W, width=120)
 
         # Create Headers
@@ -86,10 +87,32 @@ class Main:
 
         # Time
         self.header_time = customtkinter.CTkLabel(self.header_frame, text="0:00", fg_color="#D2D2D2",
-                                                  bg_color="#EEEEEE", text_color='black', font=("calibri", 38))
-        self.header_time.pack(side="right", pady=(5, 5))
+                                                  bg_color="#EEEEEE", text_color='#7D7D7D', font=("calibri", 28))
+        self.header_time.pack(side="right", pady=(12, 12), padx=(0, 15))
 
+        # Storage Management Buttons
+        self.add_product = customtkinter.CTkButton(self.header_frame, text="Add Product", corner_radius=0,
+                                                   fg_color="#47A641", hover_color="#3E9338")
+        self.add_product.pack(side="left", padx=(10, 0))
+
+        self.remove_product = customtkinter.CTkButton(self.header_frame, text="Remove Product", corner_radius=2,
+                                                      fg_color="#D94B4B", hover_color="#B23D3D")
+        self.remove_product.pack(side="left", padx=(10, 0))
+
+        self.view_product = customtkinter.CTkButton(self.header_frame, text="View Products", corner_radius=2,)
+        self.view_product.pack(side="left", padx=(10, 0))
+
+        # Starting other methods
+        self.clock()
+
+        # Application rendering loop
         self.application.mainloop()
+
+    def clock(self):
+        current_time = time.strftime("%I:%M %p")
+
+        self.header_time.configure(text=current_time)
+        self.header_time.after(1000, self.clock)
 
 
 Main()
