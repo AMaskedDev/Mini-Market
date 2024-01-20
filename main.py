@@ -42,13 +42,13 @@ class Add_Storage():
         # Barcode input
         self.barcode_input = customtkinter.CTkEntry(self.root, placeholder_text="Scan barcode",
                                                     corner_radius=0,
-                                                    text_color='black', font=("calibri", 22), width=270, height=40)
+                                                    font=("calibri", 22), width=270, height=40)
         self.barcode_input.pack(pady=(50, 5))
 
         # Button
         self.continue_button = customtkinter.CTkButton(
             self.root, text="Continue", font=("calibri", 18),
-             width=175, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2
+            width=175, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2, command=self.check_barcode
         )
         self.continue_button.pack(pady=(0, 4))
 
@@ -98,36 +98,36 @@ class Add_Storage():
 
             # Product Information
             self.product_name = customtkinter.CTkEntry(self.application, placeholder_text="Edited product name",
-                                                        corner_radius=0,
-                                                       text_color='black', font=("calibri", 22), width=270,
+                                                       corner_radius=0,
+                                                       font=("calibri", 22), width=270,
                                                        height=40)
             self.product_name.pack(pady=(5, 0))
 
             self.product_cost = customtkinter.CTkEntry(self.application, placeholder_text="Edited product cost",
-                                                        corner_radius=0,
-                                                       text_color='black', font=("calibri", 22), width=270,
+                                                       corner_radius=0,
+                                                       font=("calibri", 22), width=270,
                                                        height=40)
             self.product_cost.pack(pady=(5, 0))
 
             self.product_available = customtkinter.CTkEntry(self.application,
                                                             placeholder_text="Edited products available",
-                                                             corner_radius=0,
+                                                            corner_radius=0,
 
-                                                            text_color='black', font=("calibri", 22), width=270,
+                                                            font=("calibri", 22), width=270,
                                                             height=40)
             self.product_available.pack(pady=(5, 0))
 
             # Button
             self.add_product_button = customtkinter.CTkButton(
                 self.application, text="Edit product", font=("calibri", 18),
-                 width=175, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2,
+                width=175, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2,
                 command=self.save_new_product
             )
             self.add_product_button.pack(pady=(15, 4))
 
             # Time
             self.header_time = customtkinter.CTkLabel(self.header_frame, text="0:00",
-                                                       text_color='#7D7D7D', font=("calibri", 28))
+                                                      text_color='#7D7D7D', font=("calibri", 28))
             self.header_time.pack(side="right", pady=(12, 12), padx=(0, 15))
 
             # Starting other methods
@@ -151,32 +151,32 @@ class Add_Storage():
 
             # Product Information
             self.product_name = customtkinter.CTkEntry(self.application, placeholder_text="New product name",
-                                                        corner_radius=0,
-                                                       text_color='black', font=("calibri", 22), width=270, height=40)
+                                                       corner_radius=0,
+                                                       font=("calibri", 22), width=270, height=40)
             self.product_name.pack(pady=(5, 0))
 
             self.product_cost = customtkinter.CTkEntry(self.application, placeholder_text="New product cost",
-                                                        corner_radius=0,
-                                                       text_color='black', font=("calibri", 22), width=270, height=40)
+                                                       corner_radius=0,
+                                                       font=("calibri", 22), width=270, height=40)
             self.product_cost.pack(pady=(5, 0))
 
             self.product_available = customtkinter.CTkEntry(self.application, placeholder_text="New products available",
-                                                             corner_radius=0,
-                                                            text_color='black', font=("calibri", 22), width=270,
+                                                            corner_radius=0,
+                                                            font=("calibri", 22), width=270,
                                                             height=40)
             self.product_available.pack(pady=(5, 0))
 
             # Button
             self.add_product_button = customtkinter.CTkButton(
                 self.application, text="Add product", font=("calibri", 18),
-                 width=175, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2,
+                width=175, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2,
                 command=self.save_new_product
             )
             self.add_product_button.pack(pady=(15, 4))
 
             # Time
             self.header_time = customtkinter.CTkLabel(self.header_frame, text="0:00",
-                                                       text_color='#7D7D7D', font=("calibri", 28))
+                                                      text_color='#7D7D7D', font=("calibri", 28))
             self.header_time.pack(side="right", pady=(12, 12), padx=(0, 15))
 
             # Starting other methods
@@ -254,26 +254,27 @@ class Delete_Storage():
 
         # Barcode input
         self.barcode_input = customtkinter.CTkEntry(self.root, placeholder_text="Scan barcode",
-                                                     corner_radius=0,
-                                                    text_color='black', font=("calibri", 22), width=270, height=40)
+                                                    corner_radius=0,
+                                                    font=("calibri", 22), width=270, height=40)
         self.barcode_input.pack(pady=(50, 5))
 
         # Button
         self.continue_button = customtkinter.CTkButton(
             self.root, text="Continue", font=("calibri", 18),
-             width=175, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2
+            width=175, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2,
+            command=self.delete_product
         )
         self.continue_button.pack(pady=(0, 4))
 
         # Time
         self.header_time = customtkinter.CTkLabel(self.header_frame, text="0:00",
-                                                   text_color='#7D7D7D', font=("calibri", 28))
+                                                  text_color='#7D7D7D', font=("calibri", 28))
         self.header_time.pack(side="right", pady=(12, 12), padx=(0, 15))
 
         # Starting other methods
         self.clock()
 
-        self.barcode_input.bind("<Return>", self.check_barcode)
+        self.barcode_input.bind("<Return>", lambda event=None: self.delete_product())
 
         # Application rendering loop
         self.root.mainloop()
@@ -292,46 +293,25 @@ class Delete_Storage():
         else:
             self.product_exists = False
 
-        self.add_product()
+        self.delete_product()
 
-    def save_new_product(self):
-        product_name = self.product_name.get()
-        product_cost = self.product_cost.get()
-        product_available = self.product_available.get()
+    def delete_product(self):
+        self.barcode = self.barcode_input.get()
+        if len(self.barcode) > 0:
 
-        try:
-            float(product_cost)
-            int(product_available)
-        except ValueError:
-            messagebox.showerror("Error", "Use only numbers in cost and availability.")
-            return
+            with open("products.json", "r") as products_file:
+                data = json.load(products_file)
 
-        product_data = {
-            "name": product_name,
-            "cost": float(product_cost),
-            "available": int(product_available),
-            "runtime_available": int(product_available),
-        }
+            if self.barcode in data:
+                del data[self.barcode]
+                messagebox.showinfo("Product", "Product was removed from the storage.")
+            else:
+                messagebox.showinfo("Product", "Product was not found in storage.")
 
-        with open("products.json", "r") as products_file:
-            data = json.load(products_file)
-            products_file.close()
-
-        barcode = self.barcode if self.barcode else str(
-            int(time.time()))  # Use a timestamp as a barcode if not provided
-
-        if barcode in data:
-            # Product already exists, update it
-            data[barcode].update(product_data)
-            messagebox.showinfo("Product", "Product was edited in the storage.")
+            with open("products.json", "w") as products_file:
+                json.dump(data, products_file)
         else:
-            # Product is new, add it to the existing data
-            data[barcode] = product_data
-            messagebox.showinfo("Product", "Product was added to storage.")
-
-        with open("products.json", "w") as products_file:
-            json.dump(data, products_file)
-            products_file.close()
+            messagebox.showerror("Error", "Please input a product id.")
 
     def clock(self):
         current_time = time.strftime("%I:%M %p")
@@ -346,7 +326,7 @@ class Main:
         # Initializing the base window
         self.application = customtkinter.CTk()
         self.application._set_appearance_mode("dark")
-        #self.application.config(bg='#EEEEEE')
+        # self.application.config(bg='#EEEEEE')
         self.application.title("Mini Market")
 
         self.application.geometry("1050x600")
@@ -377,7 +357,7 @@ class Main:
 
         self.clear_button = customtkinter.CTkButton(
             self.application, text="Clear order", font=("calibri", 18),
-             fg_color="#D94B4B", hover_color="#B23D3D", width=250, height=35, corner_radius=2
+            fg_color="#D94B4B", hover_color="#B23D3D", width=250, height=35, corner_radius=2
         )
         self.clear_button.pack(pady=(0, 5))
 
