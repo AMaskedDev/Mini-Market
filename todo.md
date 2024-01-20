@@ -28,7 +28,7 @@
 
 <h1>View products</h1>
 <ul>
+    <li>Base window</li>
     <li>Barcode Scanning</li>
-    <li>Clear list button</li>
-    <li>Check in button</li>
+    <li>Table with all products [Amount Products Cost]</li>
 </ul>
