@@ -72,6 +72,10 @@ class Main:
 
         self.products_list.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
 
+        # Barcode input
+        self.barcode_input = customtkinter.CTkEntry(self.application, font=("calibri", 22), width=250, fg_color="#D94B4B", hover_color="#B23D3D")
+        self.barcode_input.pack(pady=(0, 15))
+
         # Buttons
         self.checkin_button = customtkinter.CTkButton(
             self.application, text="Check in", font=("calibri", 18),
@@ -107,6 +111,9 @@ class Main:
 
         # Application rendering loop
         self.application.mainloop()
+
+    def add_product(self):
+        pass
 
     def clock(self):
         current_time = time.strftime("%I:%M %p")
