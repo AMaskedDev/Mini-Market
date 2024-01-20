@@ -7,7 +7,7 @@ import json
 import time
 from CTkTable import *
 
-white_background = "#EEEEEE"
+customtkinter.set_appearance_mode("light")
 
 if os.path.isfile("products.json"):
     pass
@@ -226,8 +226,6 @@ class Add_Storage():
             json.dump(data, products_file)
             products_file.close()
 
-
-
     def clock(self):
         current_time = time.strftime("%I:%M %p")
 
@@ -330,8 +328,6 @@ class Main:
     def __init__(self):
         # Initializing the base window
         self.application = customtkinter.CTk()
-        self.application._set_appearance_mode("dark")
-        # self.application.config(bg='#EEEEEE')
         self.application.title("Mini Market")
 
         self.application.geometry("1050x600")
