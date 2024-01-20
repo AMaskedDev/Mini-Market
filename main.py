@@ -326,6 +326,7 @@ class Delete_Storage():
 
 class Main:
     def __init__(self):
+        customtkinter.set_appearance_mode("dark")
         # Initializing the base window
         self.application = customtkinter.CTk()
         self.application.title("Mini Market")
@@ -338,10 +339,12 @@ class Main:
                                                    corner_radius=0)
         self.header_frame.pack(fill="x")
 
+        self.product_list_frame = customtkinter.CTkScrollableFrame(self.application)
+        self.product_list_frame.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
         # Buying treeview
-        self.products_list = CTkTable(self.application, row=5, column=3, values=(["Amount", "Product", "Cost"],),
+        self.products_list = CTkTable(self.product_list_frame, row=5, column=3, values=(["Amount", "Product", "Cost"],),
                                       font=("calibri", 20))
-        self.products_list.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
+        self.products_list.pack(fill=tkinter.X)
 
         # Barcode input
         self.barcode_input = customtkinter.CTkEntry(self.application, placeholder_text="Enter barcode",
