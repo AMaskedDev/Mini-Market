@@ -215,14 +215,18 @@ class Add_Storage():
             # Product already exists, update it
             data[barcode].update(product_data)
             messagebox.showinfo("Product", "Product was edited in the storage.")
+            self.root.destroy()
         else:
             # Product is new, add it to the existing data
             data[barcode] = product_data
             messagebox.showinfo("Product", "Product was added to storage.")
+            self.root.destroy()
 
         with open("products.json", "w") as products_file:
             json.dump(data, products_file)
             products_file.close()
+
+
 
     def clock(self):
         current_time = time.strftime("%I:%M %p")
@@ -305,6 +309,7 @@ class Delete_Storage():
             if self.barcode in data:
                 del data[self.barcode]
                 messagebox.showinfo("Product", "Product was removed from the storage.")
+                self.root.destroy()
             else:
                 messagebox.showinfo("Product", "Product was not found in storage.")
 
