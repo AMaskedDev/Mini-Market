@@ -7,7 +7,7 @@ import json
 import time
 from CTkTable import *
 
-customtkinter.set_appearance_mode("light")
+customtkinter.set_appearance_mode("dark")
 
 if os.path.isfile("products.json"):
     pass
@@ -68,18 +68,21 @@ class Add_Storage():
     def check_barcode(self, event=None):
         self.barcode = self.barcode_input.get()
 
-        self.root.destroy()
+        if len(self.barcode) > 0:
 
-        with open("products.json", "r") as file:
-            data = json.load(file)
+            with open("products.json", "r") as file:
+                data = json.load(file)
 
-        if self.barcode in data:
-            self.product_exists = True
+            if self.barcode in data:
+                self.product_exists = True
 
+            else:
+                self.product_exists = False
+
+            self.root.destroy()
+            self.add_product()
         else:
-            self.product_exists = False
-
-        self.add_product()
+            messagebox.showerror("Error", "Please enter a valid product id.")
 
     def add_product(self):
         if self.product_exists:
@@ -204,27 +207,33 @@ class Add_Storage():
             "runtime_available": int(product_available),
         }
 
+        data = None
+
         with open("products.json", "r") as products_file:
             data = json.load(products_file)
-            products_file.close()
 
         barcode = self.barcode if self.barcode else str(
             int(time.time()))  # Use a timestamp as a barcode if not provided
 
-        if barcode in data:
-            # Product already exists, update it
-            data[barcode].update(product_data)
-            messagebox.showinfo("Product", "Product was edited in the storage.")
-            self.root.destroy()
-        else:
-            # Product is new, add it to the existing data
-            data[barcode] = product_data
-            messagebox.showinfo("Product", "Product was added to storage.")
-            self.root.destroy()
-
         with open("products.json", "w") as products_file:
-            json.dump(data, products_file)
-            products_file.close()
+            if barcode in data:
+                # Product already exists, update it
+                data[barcode].update(product_data)
+                messagebox.showinfo("Product", "Product was edited in the storage.")
+                if self.root:
+                    try:
+                        self.root.destroy()
+                    except:
+                        print("fuck you.")
+            else:
+                json.dump(data, products_file)
+                messagebox.showinfo("Product", "Product was added to storage.")
+                if self.root:
+                    try:
+                        self.root.destroy()
+                    except:
+                        print("fuck you.")
+
 
     def clock(self):
         current_time = time.strftime("%I:%M %p")
@@ -326,7 +335,6 @@ class Delete_Storage():
 
 class Main:
     def __init__(self):
-        customtkinter.set_appearance_mode("dark")
         # Initializing the base window
         self.application = customtkinter.CTk()
         self.application.title("Mini Market")
@@ -341,8 +349,9 @@ class Main:
 
         self.product_list_frame = customtkinter.CTkScrollableFrame(self.application)
         self.product_list_frame.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
+
         # Buying treeview
-        self.products_list = CTkTable(self.product_list_frame, row=5, column=3, values=(["Amount", "Product", "Cost"],),
+        self.products_list = CTkTable(self.product_list_frame, row=0, column=0, values=(["Amount", "Product", "Cost"],),
                                       font=("calibri", 20))
         self.products_list.pack(fill=tkinter.X)
 
