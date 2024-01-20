@@ -73,7 +73,7 @@ class Main:
         self.products_list.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
 
         # Barcode input
-        self.barcode_input = customtkinter.CTkEntry(self.application, font=("calibri", 22), width=250, fg_color="#D94B4B", hover_color="#B23D3D")
+        self.barcode_input = customtkinter.CTkEntry(self.application, font=("calibri", 22), width=250)
         self.barcode_input.pack(pady=(0, 15))
 
         # Buttons
