@@ -105,12 +105,11 @@ class Add_Product:
 
         # Continue button
         self.continue_button = customtkinter.CTkButton(
-            self.root, text="Continue", font=("calibri", 18),
+            self.root, text="Continue", font=("calibri", 18), command=self.InfoGUI,
             width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2
         )
         self.continue_button.pack(pady=(0, 4))
 
-        self.continue_button.bind("<Return>", self.InfoGUI)
 
         # Time
         self.header_clock = customtkinter.CTkLabel(self.header_frame, text="0:00", font=("calibri", 28))
