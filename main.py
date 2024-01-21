@@ -86,6 +86,7 @@ class Add_Product:
         # Variables
         self.application = None
         self.barcode = None
+        self.product_exists = False
 
         # Functions
         self.BarcodeGUI()
@@ -99,7 +100,7 @@ class Add_Product:
         # Header Frame
         self.header_frame = customtkinter.CTkFrame(self.root, height=100, corner_radius=0)
         self.header_frame.pack(fill="x", pady=(0, 30))
-
+        #
         # Barcode input
         self.product_id = customtkinter.CTkEntry(self.root, placeholder_text="Product ID", font=("calibri", 20),
                                                  width=250, height=35)
@@ -118,22 +119,35 @@ class Add_Product:
         self.header_clock = customtkinter.CTkLabel(self.header_frame, text="0:00", font=("calibri", 28))
         self.header_clock.pack(side="right", pady=(12, 12), padx=(0, 15))
 
-        self.clock()
+        self.Clock()
 
         self.root.mainloop()
 
     def Checkpoint_To_Info(self, event=None):
         self.barcode = self.product_id.get()
 
+        # Checking if the barcode is valid
         if self.barcode == "":
             messagebox.showerror("Checkpoint", "Please provide a valid product ID.")
         else:
+
+            # Checking if it exists in the storage
+            data = None
+            with open("products.json", "r") as temp:
+                data = json.load(temp)
+
+            if self.barcode in data:
+                self.product_exists = True
+            else:
+                self.product_exists = False
+
+            # Displaying the info gui
             self.root.destroy()
             self.InfoGUI()
 
     def InfoGUI(self):
         self.application = customtkinter.CTk()
-        self.application.geometry("600x550")
+        self.application.geometry("600x350")
         self.application.title("Product Scanning")
         self.application.resizable(False, False)
 
@@ -141,12 +155,20 @@ class Add_Product:
         self.header_frame = customtkinter.CTkFrame(self.application, height=100, corner_radius=0)
         self.header_frame.pack(fill="x", pady=(0, 30))
 
+        # Title
+        if self.product_exists:
+            self.title = customtkinter.CTkLabel(self.header_frame, text="Edit product", font=("calibri", 24))
+        else:
+            self.title = customtkinter.CTkLabel(self.header_frame, text="Add product", font=("calibri", 24))
+
+        self.title.pack(side="left", padx=(10, 0))
+
         # Product info
 
         # Product name
         self.product_name = customtkinter.CTkEntry(self.application, placeholder_text="Product Name", font=("calibri", 20),
                                                    width=250, height=35)
-        self.product_id.pack(pady=(10, 5))
+        self.product_name.pack(pady=(10, 5))
 
         # Product cost
         self.product_cost = customtkinter.CTkEntry(self.application, placeholder_text="Product Cost", font=("calibri", 20),
@@ -156,7 +178,7 @@ class Add_Product:
         # Product available
         self.product_available = customtkinter.CTkEntry(self.application, placeholder_text="Product Available", font=("calibri", 20),
                                                         width=250, height=35)
-        self.product_available.pack(pady=(10, 5))
+        self.product_available.pack(pady=(10, 30))
 
         # Continue button
         self.continue_button = customtkinter.CTkButton(
@@ -171,7 +193,7 @@ class Add_Product:
         self.header_clock = customtkinter.CTkLabel(self.header_frame, text="0:00", font=("calibri", 28))
         self.header_clock.pack(side="right", pady=(12, 12), padx=(0, 15))
 
-        self.clock()
+        self.Clock()
 
         self.application.mainloop()
 
@@ -180,11 +202,11 @@ class Add_Product:
         # ...
         pass
 
-    def clock(self):
+    def Clock(self):
         current_time = time.strftime("%I:%M %p")
 
         self.header_clock.configure(text=current_time)
-        self.header_clock.after(1000, self.clock)
+        self.header_clock.after(1000, self.Clock)
 
 
 Add_Product()
