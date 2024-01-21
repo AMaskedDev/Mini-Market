@@ -84,6 +84,8 @@ class Main:
 class Add_Product:
     def __init__(self):
         # Variables
+        self.application = None
+        self.barcode = None
 
         # Functions
         self.BarcodeGUI()
@@ -105,11 +107,12 @@ class Add_Product:
 
         # Continue button
         self.continue_button = customtkinter.CTkButton(
-            self.root, text="Continue", font=("calibri", 18), command=self.InfoGUI,
+            self.root, text="Continue", font=("calibri", 18), command=self.Checkpoint_To_Info,
             width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2
         )
         self.continue_button.pack(pady=(0, 4))
 
+        self.product_id.bind("<Return>", self.Checkpoint_To_Info)
 
         # Time
         self.header_clock = customtkinter.CTkLabel(self.header_frame, text="0:00", font=("calibri", 28))
@@ -119,36 +122,45 @@ class Add_Product:
 
         self.root.mainloop()
 
+    def Checkpoint_To_Info(self, event=None):
+        self.barcode = self.product_id.get()
+
+        if self.barcode == "":
+            messagebox.showerror("Checkpoint", "Please provide a valid product ID.")
+        else:
+            self.root.destroy()
+            self.InfoGUI()
+
     def InfoGUI(self):
-        self.root = customtkinter.CTk()
-        self.root.geometry("600x550")
-        self.root.title("Product Scanning")
-        self.root.resizable(False, False)
+        self.application = customtkinter.CTk()
+        self.application.geometry("600x550")
+        self.application.title("Product Scanning")
+        self.application.resizable(False, False)
 
         # Header Frame
-        self.header_frame = customtkinter.CTkFrame(self.root, height=100, corner_radius=0)
+        self.header_frame = customtkinter.CTkFrame(self.application, height=100, corner_radius=0)
         self.header_frame.pack(fill="x", pady=(0, 30))
 
         # Product info
 
         # Product name
-        self.product_name = customtkinter.CTkEntry(self.root, placeholder_text="Product Name", font=("calibri", 20),
-                                                 width=250, height=35)
+        self.product_name = customtkinter.CTkEntry(self.application, placeholder_text="Product Name", font=("calibri", 20),
+                                                   width=250, height=35)
         self.product_id.pack(pady=(10, 5))
 
         # Product cost
-        self.product_cost = customtkinter.CTkEntry(self.root, placeholder_text="Product Cost", font=("calibri", 20),
+        self.product_cost = customtkinter.CTkEntry(self.application, placeholder_text="Product Cost", font=("calibri", 20),
                                                    width=250, height=35)
         self.product_cost.pack(pady=(10, 5))
 
         # Product available
-        self.product_available = customtkinter.CTkEntry(self.root, placeholder_text="Product Available", font=("calibri", 20),
-                                                   width=250, height=35)
+        self.product_available = customtkinter.CTkEntry(self.application, placeholder_text="Product Available", font=("calibri", 20),
+                                                        width=250, height=35)
         self.product_available.pack(pady=(10, 5))
 
         # Continue button
         self.continue_button = customtkinter.CTkButton(
-            self.root, text="Continue", font=("calibri", 18),
+            self.application, text="Continue", font=("calibri", 18),
             width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2
         )
         self.continue_button.pack(pady=(0, 4))
@@ -161,13 +173,12 @@ class Add_Product:
 
         self.clock()
 
-        self.root.mainloop()
+        self.application.mainloop()
 
     def AddProduct(self, event=None):
         # Implement saving / editing logic
         # ...
         pass
-
 
     def clock(self):
         current_time = time.strftime("%I:%M %p")
