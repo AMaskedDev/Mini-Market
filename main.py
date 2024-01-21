@@ -7,7 +7,7 @@ import json
 import time
 from CTkTable import *
 
-customtkinter.set_appearance_mode("dark")
+customtkinter.set_appearance_mode("light")
 
 
 class Main:
@@ -90,19 +90,85 @@ class Add_Product:
 
     def BarcodeGUI(self):
         self.root = customtkinter.CTk()
-        self.root.geometry("500x350")
+        self.root.geometry("500x250")
         self.root.title("Product Scanning")
         self.root.resizable(False, False)
 
         # Header Frame
         self.header_frame = customtkinter.CTkFrame(self.root, height=100, corner_radius=0)
-        self.header_frame.pack(fill="x")
+        self.header_frame.pack(fill="x", pady=(0, 30))
+
+        # Barcode input
+        self.product_id = customtkinter.CTkEntry(self.root, placeholder_text="Product ID", font=("calibri", 20),
+                                                 width=250, height=35)
+        self.product_id.pack(pady=(10, 5))
+
+        # Continue button
+        self.continue_button = customtkinter.CTkButton(
+            self.root, text="Continue", font=("calibri", 18),
+            width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2
+        )
+        self.continue_button.pack(pady=(0, 4))
+
+        self.continue_button.bind("<Return>", self.InfoGUI)
 
         # Time
         self.header_clock = customtkinter.CTkLabel(self.header_frame, text="0:00", font=("calibri", 28))
         self.header_clock.pack(side="right", pady=(12, 12), padx=(0, 15))
 
+        self.clock()
+
         self.root.mainloop()
+
+    def InfoGUI(self):
+        self.root = customtkinter.CTk()
+        self.root.geometry("600x550")
+        self.root.title("Product Scanning")
+        self.root.resizable(False, False)
+
+        # Header Frame
+        self.header_frame = customtkinter.CTkFrame(self.root, height=100, corner_radius=0)
+        self.header_frame.pack(fill="x", pady=(0, 30))
+
+        # Product info
+
+        # Product name
+        self.product_name = customtkinter.CTkEntry(self.root, placeholder_text="Product Name", font=("calibri", 20),
+                                                 width=250, height=35)
+        self.product_id.pack(pady=(10, 5))
+
+        # Product cost
+        self.product_cost = customtkinter.CTkEntry(self.root, placeholder_text="Product Cost", font=("calibri", 20),
+                                                   width=250, height=35)
+        self.product_cost.pack(pady=(10, 5))
+
+        # Product available
+        self.product_available = customtkinter.CTkEntry(self.root, placeholder_text="Product Available", font=("calibri", 20),
+                                                   width=250, height=35)
+        self.product_available.pack(pady=(10, 5))
+
+        # Continue button
+        self.continue_button = customtkinter.CTkButton(
+            self.root, text="Continue", font=("calibri", 18),
+            width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2
+        )
+        self.continue_button.pack(pady=(0, 4))
+
+        self.continue_button.bind("<Return>", self.AddProduct)
+
+        # Time
+        self.header_clock = customtkinter.CTkLabel(self.header_frame, text="0:00", font=("calibri", 28))
+        self.header_clock.pack(side="right", pady=(12, 12), padx=(0, 15))
+
+        self.clock()
+
+        self.root.mainloop()
+
+    def AddProduct(self, event=None):
+        # Implement saving / editing logic
+        # ...
+        pass
+
 
     def clock(self):
         current_time = time.strftime("%I:%M %p")
@@ -111,4 +177,4 @@ class Add_Product:
         self.header_clock.after(1000, self.clock)
 
 
-Main()
+Add_Product()
