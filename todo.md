@@ -1,8 +1,9 @@
 <h1>Base window</h1>
 <ul>
+    <li>Base window ✅</li>
     <li>Barcode Scanning</li>
     <li>Clock ✅</li>
-    <li>Table for buying list ✅</li>
+    <li>Table for buying list</li>
     <li>Clear list button</li>
     <li>Check in button</li>
 </ul>

@@ -83,10 +83,32 @@ class Main:
 
 class Add_Product:
     def __init__(self):
-        pass
+        # Variables
 
-    def Add_Product_Gui(self):
-        pass
+        # Functions
+        self.BarcodeGUI()
+
+    def BarcodeGUI(self):
+        self.root = customtkinter.CTk()
+        self.root.geometry("500x350")
+        self.root.title("Product Scanning")
+        self.root.resizable(False, False)
+
+        # Header Frame
+        self.header_frame = customtkinter.CTkFrame(self.root, height=100, corner_radius=0)
+        self.header_frame.pack(fill="x")
+
+        # Time
+        self.header_clock = customtkinter.CTkLabel(self.header_frame, text="0:00", font=("calibri", 28))
+        self.header_clock.pack(side="right", pady=(12, 12), padx=(0, 15))
+
+        self.root.mainloop()
+
+    def clock(self):
+        current_time = time.strftime("%I:%M %p")
+
+        self.header_clock.configure(text=current_time)
+        self.header_clock.after(1000, self.clock)
 
 
 Main()
