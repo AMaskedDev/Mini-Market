@@ -17,6 +17,7 @@ else:
     with open("products.json", "w") as file:
         file.write({})
 
+
 class Main:
     def __init__(self):
         # Initializing the base window
@@ -173,17 +174,20 @@ class Add_Product:
         # Product info
 
         # Product name
-        self.product_name = customtkinter.CTkEntry(self.application, placeholder_text="Product Name", font=("calibri", 20),
+        self.product_name = customtkinter.CTkEntry(self.application, placeholder_text="Product Name",
+                                                   font=("calibri", 20),
                                                    width=250, height=35)
         self.product_name.pack(pady=(10, 5))
 
         # Product cost
-        self.product_cost = customtkinter.CTkEntry(self.application, placeholder_text="Product Cost", font=("calibri", 20),
+        self.product_cost = customtkinter.CTkEntry(self.application, placeholder_text="Product Cost",
+                                                   font=("calibri", 20),
                                                    width=250, height=35)
         self.product_cost.pack(pady=(10, 5))
 
         # Product available
-        self.product_available = customtkinter.CTkEntry(self.application, placeholder_text="Product Available", font=("calibri", 20),
+        self.product_available = customtkinter.CTkEntry(self.application, placeholder_text="Product Available",
+                                                        font=("calibri", 20),
                                                         width=250, height=35)
         self.product_available.pack(pady=(10, 30))
 
@@ -244,7 +248,6 @@ class Add_Product:
                 messagebox.showinfo("Product", "New product was added to storage.")
 
         self.application.destroy()
-
 
     def Clock(self):
         current_time = time.strftime("%I:%M %p")
