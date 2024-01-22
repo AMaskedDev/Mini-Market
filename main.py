@@ -1,14 +1,21 @@
 import os
-import tkinter
 import customtkinter
 from tkinter import messagebox, simpledialog, scrolledtext, ttk
-from tkinter import *
+from future.moves import tkinter
+from future.moves import tkinter
 import json
 import time
 from CTkTable import *
 
 customtkinter.set_appearance_mode("light")
 
+# Checking if the `products.json` exists
+if os.path.isfile("products.json"):
+    print("Found products json file!")
+else:
+    open("products.json", "x")
+    with open("products.json", "w") as file:
+        file.write({})
 
 class Main:
     def __init__(self):
@@ -183,11 +190,11 @@ class Add_Product:
         # Continue button
         self.continue_button = customtkinter.CTkButton(
             self.application, text="Continue", font=("calibri", 18),
-            width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2
+            width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2, command=self.AddProduct
         )
         self.continue_button.pack(pady=(0, 4))
 
-        self.continue_button.bind("<Return>", self.AddProduct)
+        self.product_available.bind("<Return>", self.AddProduct)
 
         # Time
         self.header_clock = customtkinter.CTkLabel(self.header_frame, text="0:00", font=("calibri", 28))
@@ -198,9 +205,46 @@ class Add_Product:
         self.application.mainloop()
 
     def AddProduct(self, event=None):
-        # Implement saving / editing logic
-        # ...
-        pass
+        # Getting entries input
+        product_name = self.product_name.get()
+        product_cost = self.product_cost.get()
+        product_available = self.product_available.get()
+
+        # Temporary variables
+        file_data = None
+        product_data = {
+            self.barcode: {
+                "name": product_name,
+                "cost": product_cost,
+                "available": product_available,
+            }
+        }
+
+        # Loading the json file to a temporary data variable
+        with open("products.json", "r") as file:
+            file_data = json.load(file)
+
+        # Checking if the product exists
+        if self.barcode in file_data:
+            # Updating the `old` with the `new` info
+            file_data[self.barcode].update(product_data)
+
+            with open("products.json", "w") as file:
+                json.dump(product_data, file)
+                file.close()
+
+            messagebox.showinfo("Product", "Product was edited to storage.")
+
+        else:
+            # Creating a new product
+            with open("products.json", "w") as file:
+                json.dump(product_data, file)
+                file.close()
+
+                messagebox.showinfo("Product", "New product was added to storage.")
+
+        self.application.destroy()
+
 
     def Clock(self):
         current_time = time.strftime("%I:%M %p")
