@@ -15,11 +15,14 @@ if os.path.isfile("products.json"):
 else:
     open("products.json", "x")
     with open("products.json", "w") as file:
-        file.write({})
+        file.write("{}")
 
 
 class Main:
     def __init__(self):
+        # Variables
+        self.total_cost = 0
+
         # Initializing the base window
         self.application = customtkinter.CTk()
         self.application.title("Mini Market")
@@ -36,7 +39,7 @@ class Main:
         self.product_list_frame.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
 
         # Buying treeview
-        self.products_list = CTkTable(self.product_list_frame, row=0, column=0, values=(["Amount", "Product", "Cost"],),
+        self.products_list = CTkTable(self.product_list_frame, row=0, column=0, values=[["Amount", "Product", "Cost"],],
                                       font=("calibri", 20))
         self.products_list.pack(fill=tkinter.X)
 
@@ -66,11 +69,13 @@ class Main:
 
         # Storage Management Buttons
         self.add_product = customtkinter.CTkButton(self.header_frame, text="Add Product", corner_radius=0,
-                                                   fg_color="#47A641", hover_color="#3E9338", command=lambda: Add_Product())
+                                                   fg_color="#47A641", hover_color="#3E9338",
+                                                   command=lambda: Add_Product())
         self.add_product.pack(side="left", padx=(10, 0))
 
         self.remove_product = customtkinter.CTkButton(self.header_frame, text="Remove Product", corner_radius=2,
-                                                      fg_color="#D94B4B", hover_color="#B23D3D", command=lambda: Remove_Product())
+                                                      fg_color="#D94B4B", hover_color="#B23D3D",
+                                                      command=lambda: Remove_Product())
         self.remove_product.pack(side="left", padx=(10, 0))
 
         self.view_product = customtkinter.CTkButton(self.header_frame, text="View Products", corner_radius=2)
@@ -78,15 +83,57 @@ class Main:
 
         # Starting other methods
         self.clock()
+        self.barcode_input.bind("<Return>", self.AddProduct)
 
         # Application rendering loop
         self.application.mainloop()
+
+    def AddProduct(self, event=None):
+        # Temporary variables
+        barcode = self.barcode_input.get()
+        data = None
+
+        # Visuals
+        self.barcode_input.delete(0, tkinter.END)
+        self.barcode_input.focus_set()
+
+        # Adding to treeview
+
+        if len(barcode) > 0:
+            if os.path.isfile("products.json"):
+                with open("products.json", "r") as file:
+                    data = json.load(file)
+                    file.close()
+
+                if barcode in data:
+                    amount = simpledialog.askinteger("Amount", "How many products?")
+
+                    if amount > 0:
+                        product = data[barcode]["name"]
+                        cost = data[barcode]["cost"]
+
+                        self.total_cost = data[barcode]["cost"] * amount
+                        #value=([f"{amount}", f"{product}", f"{cost}"]
+                        self.products_list.add_row(1, values=["Amount", "Product", "Cost"])
+
+                    else:
+                        messagebox.showerror("Error", "Invalid product amount")
+
+
+
+        else:
+            messagebox.showerror("Error", "Please use a valid product ID.")
 
     def clock(self):
         current_time = time.strftime("%I:%M %p")
 
         self.header_time.configure(text=current_time)
         self.header_time.after(1000, self.clock)
+
+
+class View_Products():
+    def __init__(self):
+        pass
 
 
 class Remove_Product:
@@ -172,6 +219,7 @@ class Remove_Product:
 
         else:
             messagebox.showinfo("Product", "Product was not found in storage to remove.")
+
     def Clock(self):
         current_time = time.strftime("%I:%M %p")
 
@@ -311,6 +359,7 @@ class Add_Product:
                 "name": product_name,
                 "cost": product_cost,
                 "available": product_available,
+                "runtime": product_available
             }
         }
 
