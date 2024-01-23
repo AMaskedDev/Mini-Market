@@ -1,7 +1,7 @@
 import os
 import customtkinter
+from tkinter import messagebox, simpledialog, scrolledtext, ttk
 import tkinter
-import tkinter.simpledialog as simpledialog
 import json
 import time
 from CTkTable import *
@@ -38,7 +38,7 @@ class Main:
         self.product_list_frame.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
 
         # Buying treeview
-        self.products_list = CTkTable(self.product_list_frame, row=0, column=0, values=[["Amount", "Product", "Cost"]],
+        self.products_list = CTkTable(self.product_list_frame, row=0, column=0, values=[["Amount", "Product", "Cost"],],
                                       font=("calibri", 20))
         self.products_list.pack(fill=tkinter.X)
 
@@ -112,8 +112,7 @@ class Main:
                         cost = data[barcode]["cost"]
 
                         self.total_cost = data[barcode]["cost"] * amount
-                        #value=([f"{amount}", f"{product}", f"{cost}"]
-                        self.products_list.add_row([1,"2TB",50])
+                        self.products_list.add_row(values=[f"{amount}", f"{product}", f"{cost}"])
 
                     else:
                         messagebox.showerror("Error", "Invalid product amount")
