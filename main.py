@@ -6,6 +6,7 @@ import json
 import time
 from CTkTable import *
 import atexit
+import threading
 
 customtkinter.set_appearance_mode("light")
 
@@ -75,15 +76,15 @@ class Main:
         # Storage Management Buttons
         self.add_product = customtkinter.CTkButton(self.header_frame, text="Add Product", corner_radius=0,
                                                    fg_color="#47A641", hover_color="#3E9338",
-                                                   command=lambda: Add_Product())
+                                                   command=lambda:threading.Thread(target=Add_Product()).start())
         self.add_product.pack(side="left", padx=(10, 0))
 
         self.remove_product = customtkinter.CTkButton(self.header_frame, text="Remove Product", corner_radius=2,
                                                       fg_color="#D94B4B", hover_color="#B23D3D",
-                                                      command=lambda: Remove_Product())
+                                                      command=lambda: threading.Thread(target=Remove_Product()).start())
         self.remove_product.pack(side="left", padx=(10, 0))
 
-        self.view_product = customtkinter.CTkButton(self.header_frame, text="View Products", corner_radius=2)
+        self.view_product = customtkinter.CTkButton(self.header_frame, text="View Products", corner_radius=2, command=lambda: threading.Thread(target=View_Products()).start())
         self.view_product.pack(side="left", padx=(10, 0))
 
         # Starting other methods
@@ -497,11 +498,13 @@ class Add_Product:
         else:
             messagebox.showerror("Invalid Product Info", f"Product was not added, invalid product information.")
 
+        self.application.destroy()
+
     def Clock(self):
         current_time = time.strftime("%I:%M %p")
 
         self.header_clock.configure(text=current_time)
         self.header_clock.after(1000, self.Clock)
 
-
-Main()
+main_thread = threading.Thread(target=lambda:Main())
+main_thread.start()
