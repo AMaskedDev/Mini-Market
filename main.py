@@ -50,11 +50,11 @@ class Main:
         self.barcode_input.pack(pady=(0, 15))
 
         # Buttons
-        self.checkin_button = customtkinter.CTkButton(
+        self.add_button = customtkinter.CTkButton(
             self.application, text="Add Product", font=("calibri", 18),
             width=250, height=35, corner_radius=2, command=self.AddProduct
         )
-        self.checkin_button.pack(pady=(0, 4))
+        self.add_button.pack(pady=(0, 4))
 
         self.checkin_button = customtkinter.CTkButton(
             self.application, text="Check in", font=("calibri", 18),
@@ -62,11 +62,11 @@ class Main:
         )
         self.checkin_button.pack(pady=(0, 4))
 
-        self.checkin_button = customtkinter.CTkButton(
+        self.clear_button = customtkinter.CTkButton(
             self.application, text="Clear", font=("calibri", 18),
-            width=250, height=35, fg_color="#AB2525", hover_color="#942020", corner_radius=2, command=self.Checkin
+            width=250, height=35, fg_color="#AB2525", hover_color="#942020", corner_radius=2, command=self.Clear
         )
-        self.checkin_button.pack(pady=(0, 15))
+        self.clear_button.pack(pady=(0, 15))
 
         # Time
         self.header_time = customtkinter.CTkLabel(self.header_frame, text="0:00",
@@ -76,7 +76,7 @@ class Main:
         # Storage Management Buttons
         self.add_product = customtkinter.CTkButton(self.header_frame, text="Add Product", corner_radius=0,
                                                    fg_color="#47A641", hover_color="#3E9338",
-                                                   command=lambda:threading.Thread(target=Add_Product()).start())
+                                                   command=lambda: threading.Thread(target=Add_Product()).start())
         self.add_product.pack(side="left", padx=(10, 0))
 
         self.remove_product = customtkinter.CTkButton(self.header_frame, text="Remove Product", corner_radius=2,
@@ -106,6 +106,7 @@ class Main:
             with open("products.json", "r") as file:
                 data = json.load(file)
                 for product_data in data.values():
+                    product_data["available"] -= self.amount
                     product_data["runtime"] = product_data["available"]
 
             with open("products.json", "w") as file:
@@ -120,6 +121,29 @@ class Main:
             self.barcode_input.focus_set()
         else:
             messagebox.showinfo("Error", "Couldn't checkout. \nNo products to buy!")
+
+    def Clear(self):
+        if self.total_cost > 0:
+            # Reset the runtime back to available when closing the window
+            data = None
+            with open("products.json", "r") as file:
+                data = json.load(file)
+                for product_data in data.values():
+                    product_data["available"] -= self.amount
+                    product_data["runtime"] = product_data["available"]
+
+            with open("products.json", "w") as file:
+                json.dump(data, file)
+
+            self.products_list.destroy()
+            self.products_list = CTkTable(self.product_list_frame, row=0, column=0, values=[["Amount", "Product", "Cost"], ],
+                                          font=("calibri", 20))
+            self.products_list.pack(fill=tkinter.X)
+
+            self.barcode_input.delete(0, tkinter.END)
+            self.barcode_input.focus_set()
+        else:
+            messagebox.showinfo("Error", "Couldn't clear. \nNo products to clear!")
 
     def AddProduct(self, event=None):
         # Temporary variables
@@ -138,18 +162,18 @@ class Main:
                     file.close()
 
                 if barcode in data:
-                    amount = simpledialog.askinteger("Amount", "How many products?")
+                    self.amount = simpledialog.askinteger("Amount", "How many products?")
 
-                    if amount > 0:
+                    if self.amount > 0:
                         runtime = data[barcode].get("runtime", 0)  # Get the current runtime or default to 0
-                        if runtime >= amount:
-                            data[barcode]["runtime"] -= amount
+                        if runtime >= self.amount:
+                            data[barcode]["runtime"] -= self.amount
 
                             product = data[barcode]["name"]
                             cost = data[barcode]["cost"]
 
-                            self.total_cost += data[barcode]["cost"] * amount
-                            self.products_list.add_row(values=[f"{amount}", f"{product}", f"{cost * amount}"])
+                            self.total_cost += data[barcode]["cost"] * self.amount
+                            self.products_list.add_row(values=[f"{self.amount}", f"{product}", f"{cost * self.amount}"])
 
                             # Update runtime in the file
                             with open("products.json", "w") as file:
@@ -187,8 +211,10 @@ class Main:
         self.header_time.after(1000, self.clock)
 
 
-class View_Products():
+class View_Products:
     def __init__(self):
+        self.product_barcode = None
+
         # Initializing the base window
         self.application = customtkinter.CTk()
         self.application.title("Mini Market")
@@ -213,6 +239,20 @@ class View_Products():
                                                   font=("calibri", 28))
         self.header_time.pack(side="right", pady=(12, 12), padx=(0, 15))
 
+        # Storage Management
+        self.scan_barcode = customtkinter.CTkButton(self.header_frame, text="Scan barcode", corner_radius=0,
+                                                    fg_color="#47A641", hover_color="#3E9338",
+                                                    command=lambda: threading.Thread(target=self.BarcodeScan()).start())
+        self.scan_barcode.pack(side="left", padx=(10, 0))
+
+        self.remove_product = customtkinter.CTkButton(self.header_frame, text="Remove All Product", corner_radius=2,
+                                                      fg_color="#D94B4B", hover_color="#B23D3D",
+                                                      command=self.RemoveAll)
+        self.remove_product.pack(side="left", padx=(10, 0))
+
+        self.refresh_products = customtkinter.CTkButton(self.header_frame, text="Refresh Products", corner_radius=2, command=lambda: threading.Thread(target=self.Refresh()).start())
+        self.refresh_products.pack(side="left", padx=(10, 0))
+
         # Starting other methods
         self.clock()
         self.AddProducts()
@@ -220,7 +260,99 @@ class View_Products():
         # Application rendering loop
         self.application.mainloop()
 
+    def RemoveAll(self):
+        verification = messagebox.askyesno("Continue", "Are you sure removing every product?")
+
+        if verification:
+            os.remove("products.json")
+
+            open("products.json", "x")
+            with open("products.json", "w") as file:
+                file.write("{}")
+
+            self.application.destroy()
+            messagebox.showinfo("Success", "Removed every product in storage.")
+        else:
+            messagebox.showinfo("Unsuccessful", "Canceled the operation.")
+
     def AddProducts(self):
+        data = None
+
+        if os.path.isfile("products.json"):
+            with open("products.json", "r") as file:
+                data = json.load(file)
+
+            for barcode, product_data in data.items():
+                product_name = product_data.get("name", "")
+                product_cost = product_data.get("cost", "")
+                product_available = product_data.get("available", "")
+
+                self.products_list.add_row(values=[f"{product_name}", f"{product_cost}", f"{product_available}"])
+
+    def BarcodeScan(self):
+        self.root = customtkinter.CTk()
+        self.root.geometry("500x250")
+        self.root.title("Product Scanning")
+        self.root.resizable(False, False)
+
+        # Header Frame
+        self.header_frame = customtkinter.CTkFrame(self.root, height=100, corner_radius=0)
+        self.header_frame.pack(fill="x", pady=(0, 30))
+        #
+        # Barcode input
+        self.product_id = customtkinter.CTkEntry(self.root, placeholder_text="Product ID", font=("calibri", 20),
+                                                 width=250, height=35)
+        self.product_id.pack(pady=(10, 5))
+
+        # Continue button
+        self.continue_button = customtkinter.CTkButton(
+            self.root, text="Continue", font=("calibri", 18), command=self.Checkpoint_To_Scan,
+            width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2
+        )
+        self.continue_button.pack(pady=(0, 4))
+
+        self.product_id.bind("<Return>", self.Checkpoint_To_Scan)
+
+        # Time
+        self.header_clock = customtkinter.CTkLabel(self.header_frame, text="0:00", font=("calibri", 28))
+        self.header_clock.pack(side="right", pady=(12, 12), padx=(0, 15))
+
+        self.clock()
+
+        self.root.mainloop()
+
+    def Checkpoint_To_Scan(self, event=None):
+        self.product_barcode = self.product_id.get()
+
+        if len(self.product_barcode) > 0:
+            self.Scan_Refresh()
+            self.root.destroy()
+        else:
+            messagebox.showerror("Error", "Invalid barcode")
+
+    def Scan_Refresh(self):
+        self.products_list.destroy()
+        self.products_list = CTkTable(self.product_list_frame, row=0, column=0, values=[["Amount", "Product", "Cost"], ],
+                                      font=("calibri", 20))
+        self.products_list.pack(fill=tkinter.X)
+
+        if os.path.isfile("products.json"):
+            with open("products.json", "r") as file:
+                data = json.load(file)
+
+            if self.product_barcode in data:
+                product_name = data[self.product_barcode]["name"]
+                product_cost = data[self.product_barcode]["cost"]
+                product_available = data[self.product_barcode]["available"]
+
+                self.products_list.add_row(values=[f"{product_name}", f"{product_cost}", f"{product_available}"])
+
+    def Refresh(self):
+        self.products_list.destroy()
+        self.products_list = CTkTable(self.product_list_frame, row=0, column=0, values=[["Amount", "Product", "Cost"], ],
+                                      font=("calibri", 20))
+        self.products_list.pack(fill=tkinter.X)
+
         data = None
 
         if os.path.isfile("products.json"):
@@ -459,7 +591,7 @@ class Add_Product:
         data = None
 
         try:
-            int(product_cost)
+            float(product_cost)
             int(product_available)
         except ValueError:
             messagebox.showerror("Error", "Use only numbers in cost and availability.")
@@ -468,7 +600,7 @@ class Add_Product:
         product_data = {
             self.barcode: {
                 "name": product_name,
-                "cost": int(product_cost),
+                "cost": float(product_cost),
                 "available": int(product_available),
                 "runtime": int(product_available)
             }
@@ -506,5 +638,6 @@ class Add_Product:
         self.header_clock.configure(text=current_time)
         self.header_clock.after(1000, self.Clock)
 
-main_thread = threading.Thread(target=lambda:Main())
+
+main_thread = threading.Thread(target=lambda: Main())
 main_thread.start()
