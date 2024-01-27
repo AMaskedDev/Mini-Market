@@ -8,6 +8,7 @@ import configparser
 import json
 import os
 import sys
+import subprocess
 import time
 
 import atexit
@@ -26,9 +27,8 @@ if not os.path.isfile(config_file_path):
 config = configparser.ConfigParser()
 config.read(config_file_path)
 
-dark_theme_enabled = config.getboolean('Theme', 'darked-theme')
-
 darkethemed = config.getboolean('Theme', 'darked-theme')
+time_format = config.getboolean('Theme', 'time-format')
 
 # Setting the theme based on user settings
 if darkethemed:
@@ -36,6 +36,16 @@ if darkethemed:
 else:
     customtkinter.set_appearance_mode("light")
     
+    
+def Restart():
+    # Getting script path
+    script = sys.argv
+    
+    # Run a new instance of the script
+    subprocess.Popen([sys.executable] + script)
+
+    # Exit the current instance
+    sys.exit()
 
 # Checking if the `products.json` exists
 if os.path.isfile("products.json"):
@@ -288,10 +298,15 @@ class Main:
 
     def Clock(self):
         # Setting the format
-        current_time = time.strftime("%I:%M %p")
+        time_ampm = time.strftime("%I:%M %p")
+        time_24h = time.strftime("%H:%M")
 
         # Changing the text and recalling this function after 1 second
-        self.ClockL.configure(text=current_time)
+        if time_format == 1:
+            self.ClockL.configure(text=time_ampm)
+        elif time_format == 0:
+            self.ClockL.configure(text=time_24h)
+            
         self.ClockL.after(1000, self.Clock)
 
 
@@ -316,61 +331,83 @@ class Settings:
 
         # Settings
         self.DarkThemedC = customtkinter.CTkCheckBox(self.application, text="Dark Themed", font=("calibri", 18))
-        self.DarkThemedC.pack(pady=(20, 0))
+        self.DarkThemedC.pack(pady=(10, 0))
+        
+        self.TimeFormatC = customtkinter.CTkCheckBox(self.application, text="Time Format (AM/PM / 24H)", font=("calibri", 18))
+        self.TimeFormatC.pack(pady=(10, 0))
         
         self.AddProductB = customtkinter.CTkButton(self.application, text="Done", font=("calibri", 18), width=250, height=35, corner_radius=2, command=self.SaveSettings)
-        self.AddProductB.pack(side="bottom", pady=(20, 0))
+        self.AddProductB.pack(side="bottom", pady=(0, 20))
+        
+        self.label = customtkinter.CTkLabel(self.application, text="Click `done` for changes to take effect", font=("calibri", 16))
+        self.label.pack(side="bottom", pady=(0, 10))
 
         # Starting other methods
         self.Clock()
+        self.Unneccessary()
         self.GetSettings()
 
         # Application rendering loop
         self.application.mainloop()
         
     def GetSettings(self):
-        global config_file_path
-        
-        # Read the configuration file
-        config.read(config_file_path)
-
-        # Get the boolean value of 'darked-theme' from the 'Theme' section
-        theme = config.getboolean('Theme', 'darked-theme')
+        global darkethemed, time_format
         
         # Set the checkboxes acording to settings
-        if theme == 1:
-            self.DarkThemedC.select()
-        elif theme == 0:
-            self.DarkThemedC.deselect()
-
+        if darkethemed == 1: self.DarkThemedC.select()
+        elif darkethemed == 0: self.DarkThemedC.deselect()
+        
+        if time_format == 1: self.TimeFormatC.select()
+        elif time_format == 0: self.TimeFormatC.deselect()
         
     def SaveSettings(self):
         global config_file_path
         
-        # Getting the value of the Checkbutton
+        # Getting the value of the settings
         darkthemed = self.DarkThemedC.get()
-
-        # Convert the value to a boolean if needed
-        darkthemed_bool = bool(darkthemed)
+        timeformat = self.TimeFormatC.get()
         
         # Set the updated value in the configuration
         config.set('Theme', 'darked-theme', str(darkthemed))
+        config.set('Theme', 'time-format', str(timeformat))
         
         # Save the changes back to the configuration file
         with open(config_file_path, 'w') as config_file:
             config.write(config_file)
             
-        # Close the program
-        sys.exit()
+        if messagebox.askyesno("Continue", "Are you sure this will restart the program, \nany client-side changes will be removed."):
+            Restart()
              
-    
     def Clock(self):
         # Setting the format
-        current_time = time.strftime("%I:%M %p")
+        time_ampm = time.strftime("%I:%M %p")
+        time_24h = time.strftime("%H:%M")
 
         # Changing the text and recalling this function after 1 second
-        self.ClockL.configure(text=current_time)
+        if time_format == 1:
+            self.ClockL.configure(text=time_ampm)
+        elif time_format == 0:
+            self.ClockL.configure(text=time_24h)
+         
         self.ClockL.after(1000, self.Clock)
+        
+    def Unneccessary(self):
+        time_ampm = time.strftime("%I:%M %p")
+        time_24h = time.strftime("%H:%M")
+        
+        if self.TimeFormatC.get() == 1:
+            self.TimeFormatC.configure(text=f"Time Format ({time_ampm})")
+        elif self.TimeFormatC.get() == 0:
+            self.TimeFormatC.configure(text=f"Time Format ({time_24h})")
+            
+        if self.DarkThemedC.get() == 1:
+            self.DarkThemedC.configure(text=f"Dark theme (Enabled)")
+        elif self.DarkThemedC.get() == 0:
+            self.DarkThemedC.configure(text=f"Dark theme (Disabled)")
+            
+        self.application.after(20, self.Unneccessary)
+            
+
 
 
 class View_Products:
@@ -506,18 +543,23 @@ class View_Products:
                 messagebox.showerror("Error", "Couldn't find product in storage with that ID")
                 return
             
-                product_name = data[self.product_barcode]["name"]
-                product_cost = data[self.product_barcode]["cost"]
-                product_available = data[self.product_barcode]["available"]
+            product_name = data[self.product_barcode]["name"]
+            product_cost = data[self.product_barcode]["cost"]
+            product_available = data[self.product_barcode]["available"]
 
-                self.ProductsTable.add_row(values=[f"{product_name}", f"{product_cost}", f"{product_available}"])
+            self.ProductsTable.add_row(values=[f"{product_name}", f"{product_cost}", f"{product_available}"])
 
     def Clock(self):
         # Setting the format
-        current_time = time.strftime("%I:%M %p")
+        time_ampm = time.strftime("%I:%M %p")
+        time_24h = time.strftime("%H:%M")
 
         # Changing the text and recalling this function after 1 second
-        self.ClockL.configure(text=current_time)
+        if time_format == 1:
+            self.ClockL.configure(text=time_ampm)
+        elif time_format == 0:
+            self.ClockL.configure(text=time_24h)
+            
         self.ClockL.after(1000, self.Clock)
 
 
@@ -604,10 +646,15 @@ class Remove_Product:
 
     def Clock(self):
         # Setting the format
-        current_time = time.strftime("%I:%M %p")
+        time_ampm = time.strftime("%I:%M %p")
+        time_24h = time.strftime("%H:%M")
 
         # Changing the text and recalling this function after 1 second
-        self.ClockL.configure(text=current_time)
+        if time_format == 1:
+            self.ClockL.configure(text=time_ampm)
+        elif time_format == 0:
+            self.ClockL.configure(text=time_24h)
+            
         self.ClockL.after(1000, self.Clock)
 
 
@@ -773,10 +820,15 @@ class Add_Product:
 
     def Clock(self):
         # Setting the format
-        current_time = time.strftime("%I:%M %p")
+        time_ampm = time.strftime("%I:%M %p")
+        time_24h = time.strftime("%H:%M")
 
         # Changing the text and recalling this function after 1 second
-        self.ClockL.configure(text=current_time)
+        if time_format == 1:
+            self.ClockL.configure(text=time_ampm)
+        elif time_format == 0:
+            self.ClockL.configure(text=time_24h)
+            
         self.ClockL.after(1000, self.Clock)
 
 
