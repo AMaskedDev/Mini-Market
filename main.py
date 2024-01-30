@@ -90,20 +90,16 @@ class Main:
         self.application = customtkinter.CTk()
         self.application.title("Mini Market")
         self.application.geometry("1050x700")
-        
-        #self.application.wm_iconbitmap("favicon.ico")
 
-        # Tabs
-        self.ViewTab = customtkinter.CTkTabview(self.application, height=700, width=1050)
-        self.ViewTab.pack()
+        # Header Frame
+        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=5)
+        self.Header.pack(fill="x")
         
-        self.ViewTab.add("Main")
-        self.ViewTab.add("Settings")
-        
-        # Application rendering loop
-        self.application.mainloop()
-        
-        """ # Buying treeview
+        # Clock
+        self.ClockL = customtkinter.CTkLabel(self.Header, text="0:00", font=("calibri", 28))
+        self.ClockL.pack(side="right", pady=(12, 12), padx=(0, 15))
+
+        # Buying treeview
         self.ProductsTableFrame = customtkinter.CTkScrollableFrame(self.application)
         self.ProductsTableFrame.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
         
@@ -111,35 +107,34 @@ class Main:
         self.ProductsTable.pack(fill=tkinter.X)
 
         # Barcode input
-        self.BarcodeE = customtkinter.CTkEntry(self.application, placeholder_text="Enter barcode", corner_radius=0, font=("calibri", 22), width=270, height=40)
-        self.BarcodeE.pack(pady=(0, 15))
+        self.BarcodeE = customtkinter.CTkEntry(self.application, placeholder_text="Enter barcode", corner_radius=5, font=("calibri", 22), width=270, height=40)
+        self.BarcodeE.pack(pady=(0, 0))
 
         # Buttons
-        self.AddProductB = customtkinter.CTkButton(self.application, text="Add Product", font=("calibri", 18), width=250, height=35, corner_radius=2, command=self.Checkpoint_To_AddTableProduct)
-        self.AddProductB.pack(pady=(0, 15))
+        self.AddProductB = customtkinter.CTkButton(self.application, text="Add Product", font=("calibri", 18), width=270, height=35, corner_radius=5, command=self.Checkpoint_To_AddTableProduct)
+        self.AddProductB.pack(pady=(5, 0))
 
-        self.CheckinB = customtkinter.CTkButton( self.application, text="Check in", font=("calibri", 18), width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2, command=self.Checkin)
-        self.CheckinB.pack(pady=(0, 4))
+        self.CheckinB = customtkinter.CTkButton( self.application, text="Check in", font=("calibri", 18), width=245, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=5, command=self.Checkin)
+        self.CheckinB.pack(pady=(10, 0))
 
-        self.ClearB = customtkinter.CTkButton(self.application, text="Clear", font=("calibri", 18), width=250, height=35, fg_color="#AB2525", hover_color="#942020", corner_radius=2, command=self.ClearTable)
-        self.ClearB.pack(pady=(0, 15))
+        self.ClearB = customtkinter.CTkButton(self.application, text="Clear", font=("calibri", 18), width=245, height=35, fg_color="#AB2525", hover_color="#942020", corner_radius=5, command=self.ClearTable)
+        self.ClearB.pack(pady=(3, 10))
 
         # Storage Management Buttons
-        self.Storage_AddProductB = customtkinter.CTkButton(self.Header, text="Add Product", corner_radius=0, fg_color="#47A641", hover_color="#3E9338", command=lambda: threading.Thread(target=Add_Product()).start())
+        self.Storage_AddProductB = customtkinter.CTkButton(self.Header, text="Add Product", corner_radius=5, fg_color="#47A641", hover_color="#3E9338", command=lambda: threading.Thread(target=Add_Product()).start())
         self.Storage_AddProductB.pack(side="left", padx=(10, 0))
 
-        self.Storage_RemoveProductB = customtkinter.CTkButton(self.Header, text="Remove Product", corner_radius=2, fg_color="#D94B4B", hover_color="#B23D3D", command=lambda: threading.Thread(target=Remove_Product()).start())
+        self.Storage_RemoveProductB = customtkinter.CTkButton(self.Header, text="Remove Product", corner_radius=5, fg_color="#D94B4B", hover_color="#B23D3D", command=lambda: threading.Thread(target=Remove_Product()).start())
         self.Storage_RemoveProductB.pack(side="left", padx=(10, 0))
 
-        self.Storage_ViewProductB = customtkinter.CTkButton(self.Header, text="View Products", corner_radius=2, command=lambda: threading.Thread(target=View_Products()).start())
+        self.Storage_ViewProductB = customtkinter.CTkButton(self.Header, text="View Products", corner_radius=5, fg_color="#597ec2", hover_color="#456399", command=lambda: threading.Thread(target=View_Products()).start())
         self.Storage_ViewProductB.pack(side="left", padx=(10, 0))
         
-        self.SettingsB = customtkinter.CTkButton(self.Header, text="Settings", corner_radius=2, command=lambda: threading.Thread(target=Settings()).start())
+        self.SettingsB = customtkinter.CTkButton(self.Header, text="Settings", corner_radius=5, fg_color="#556378", hover_color="#cfcfcf", command=lambda: threading.Thread(target=Settings()).start())
         self.SettingsB.pack(side="right", padx=(0, 50))
 
         # Starting other methods
         self.Clock()
-        #self.SettingsView()
 
         # Binding commands / events to functions
         self.BarcodeE.bind("<Return>", self.Checkpoint_To_AddTableProduct)
@@ -148,7 +143,7 @@ class Main:
         atexit.register(self.ResetProducts)
 
         # Application rendering loop
-        self.application.mainloop() """
+        self.application.mainloop()
 
     def Checkin(self):
         if self.total_products_cost > 0:
@@ -227,7 +222,7 @@ class Main:
         self.application.resizable(False, False)
 
         # Header Frame
-        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=0)
+        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=5)
         self.Header.pack(fill="x")
         
         # Clock
@@ -235,10 +230,10 @@ class Main:
         self.ClockL.pack(side="right", pady=(12, 12), padx=(0, 15))
 
         # Barcode input
-        self.ProductAmountE = customtkinter.CTkEntry(self.application, placeholder_text="Enter amounts", corner_radius=0, font=("calibri", 22), width=270, height=40)
+        self.ProductAmountE = customtkinter.CTkEntry(self.application, placeholder_text="Enter amounts", corner_radius=5, font=("calibri", 22), width=270, height=40)
         self.ProductAmountE.pack(pady=(15, 0))
         
-        self.DiscountAmountE = customtkinter.CTkEntry(self.application, placeholder_text="Enter discount", corner_radius=0, font=("calibri", 22), width=270, height=40)
+        self.DiscountAmountE = customtkinter.CTkEntry(self.application, placeholder_text="Enter discount", corner_radius=5, font=("calibri", 22), width=270, height=40)
         self.DiscountAmountE.pack(pady=(10, 15))
 
         # Button
@@ -334,16 +329,9 @@ class Main:
             self.ClockL.configure(text=time_24h)
             
         self.ClockL.after(1000, self.Clock)
-        
-    def SettingsView(self):
-        if self.ViewTab.tab("Main"):
-            self.application.destroy()
-            Settings()
-        
-        self.application.after(73, self.SettingsView)
 
 
-""" class Settings:
+class Settings:
     def __init__(self):
         # Start functions
         self.MainGUI()
@@ -355,14 +343,14 @@ class Main:
         self.application.geometry("800x500")
 
         # Header Frame
-        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=0)
+        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=5)
         self.Header.pack(fill="x")
         
         # Clock
         self.ClockL = customtkinter.CTkLabel(self.Header, text="0:00", font=("calibri", 28))
         self.ClockL.pack(side="right", pady=(12, 12), padx=(0, 15))
         
-        self.HelpB = customtkinter.CTkButton(self.Header, text="Help Menu", corner_radius=2, command=self.Help)
+        self.HelpB = customtkinter.CTkButton(self.Header, text="Help Menu", corner_radius=5, command=self.Help)
         self.HelpB.pack(side="left", padx=(10, 0))
 
         # Settings
@@ -373,11 +361,11 @@ class Main:
         self.TimeFormatC.pack(pady=(10, 0))
         
         # Buttons
-        self.ExitB = customtkinter.CTkButton(self.application, text="Exit", font=("calibri", 18), width=250, height=35, fg_color="#AB2525", hover_color="#942020", corner_radius=2, command=lambda: Main())
+        self.ExitB = customtkinter.CTkButton(self.application, text="Exit", font=("calibri", 18), width=250, height=35, fg_color="#AB2525", hover_color="#942020", corner_radius=5, command=lambda: self.application.destroy())
         self.ExitB.pack(side="bottom", pady=(0, 20))
         
-        self.AddProductB = customtkinter.CTkButton(self.application, text="Done", font=("calibri", 18), width=250, height=35, corner_radius=2, command=self.SaveSettings)
-        self.AddProductB.pack(side="bottom", pady=(0, 5))
+        self.DoneB = customtkinter.CTkButton(self.application, text="Done", fg_color="#47A641", hover_color="#3E9338",font=("calibri", 18), width=250, height=35, corner_radius=5, command=self.SaveSettings)
+        self.DoneB.pack(side="bottom", pady=(0, 5))
         
         # Label
         self.informationL = customtkinter.CTkLabel(self.application, text="Click `done` for changes to take effect", font=("calibri", 16))
@@ -385,7 +373,8 @@ class Main:
         
         # Starting other methods
         self.Clock()
-        
+        self.Unneccessary()
+
         # Application rendering loop
         self.application.mainloop()
         
@@ -396,7 +385,7 @@ class Main:
         self.applicationt.geometry("900x600")
 
         # Header Frame
-        self.Header = customtkinter.CTkFrame(self.applicationt, height=100, corner_radius=0)
+        self.Header = customtkinter.CTkFrame(self.applicationt, height=100, corner_radius=5)
         self.Header.pack(fill="x")
         
         # Clock
@@ -498,7 +487,7 @@ class View_Products:
         self.application.geometry("1050x600")
 
         # Header Frame
-        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=0)
+        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=5)
         self.Header.pack(fill="x")
         
         # Clock
@@ -513,13 +502,13 @@ class View_Products:
         self.ProductsTable.pack(fill=tkinter.X)
 
         # Storage Management
-        self.FindProductB = customtkinter.CTkButton(self.Header, text="Find product", corner_radius=0, fg_color="#47A641", hover_color="#3E9338", command=lambda: threading.Thread(target=self.FindProduct()).start())
+        self.FindProductB = customtkinter.CTkButton(self.Header, text="Find product", corner_radius=5, fg_color="#47A641", hover_color="#3E9338", command=lambda: threading.Thread(target=self.FindProduct()).start())
         self.FindProductB.pack(side="left", padx=(10, 0))
 
-        self.RemoveProductsB = customtkinter.CTkButton(self.Header, text="Remove All Product", corner_radius=2, fg_color="#D94B4B", hover_color="#B23D3D", command=self.RemoveAll)
+        self.RemoveProductsB = customtkinter.CTkButton(self.Header, text="Remove All Product", corner_radius=5, fg_color="#D94B4B", hover_color="#B23D3D", command=self.RemoveAll)
         self.RemoveProductsB.pack(side="left", padx=(10, 0))
 
-        self.RefreshTableB = customtkinter.CTkButton(self.Header, text="Refresh Products", corner_radius=2, command=lambda: threading.Thread(target=self.AddProducts()).start())
+        self.RefreshTableB = customtkinter.CTkButton(self.Header, text="Refresh Products", corner_radius=5, command=lambda: threading.Thread(target=self.AddProducts()).start())
         self.RefreshTableB.pack(side="left", padx=(10, 0))
 
         # Starting other methods
@@ -575,7 +564,7 @@ class View_Products:
         self.root.resizable(False, False)
 
         # Header Frame
-        self.Header = customtkinter.CTkFrame(self.root, height=100, corner_radius=0)
+        self.Header = customtkinter.CTkFrame(self.root, height=100, corner_radius=5)
         self.Header.pack(fill="x", pady=(0, 30))
         
         # Clock
@@ -660,7 +649,7 @@ class Remove_Product:
         self.root.resizable(False, False)
 
         # Header Frame
-        self.Header = customtkinter.CTkFrame(self.root, height=100, corner_radius=0)
+        self.Header = customtkinter.CTkFrame(self.root, height=100, corner_radius=5)
         self.Header.pack(fill="x", pady=(0, 30))
         
         # Clock
@@ -757,7 +746,7 @@ class Add_Product:
         self.root.resizable(False, False)
 
         # Header Frame
-        self.Header = customtkinter.CTkFrame(self.root, height=100, corner_radius=0)
+        self.Header = customtkinter.CTkFrame(self.root, height=100, corner_radius=5)
         self.Header.pack(fill="x", pady=(0, 30))
         
         # Clock
@@ -811,7 +800,7 @@ class Add_Product:
         self.application.resizable(False, False)
 
         # Header Frame
-        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=0)
+        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=5)
         self.Header.pack(fill="x", pady=(0, 30))
 
         # Clock
@@ -835,7 +824,7 @@ class Add_Product:
         self.ProductAvailableE = customtkinter.CTkEntry(self.application, placeholder_text="Product Available", font=("calibri", 20), width=250, height=35)
         self.ProductAvailableE.pack(pady=(10, 30))
 
-        self.ContinueB = customtkinter.CTkButton(self.application, text="Continue", font=("calibri", 18), width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2, command=self.AddProduct)
+        self.ContinueB = customtkinter.CTkButton(self.application, text="Continue", font=("calibri", 18), width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=5, command=self.AddProduct)
         self.ContinueB.pack(pady=(0, 4))
 
         # Binding commands / events to functions
@@ -912,7 +901,7 @@ class Add_Product:
             self.ClockL.configure(text=time_24h)
             
         self.ClockL.after(1000, self.Clock)
- """
+
 
 # Start of the project
 if __name__ == "__main__":
