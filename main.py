@@ -3,7 +3,7 @@ import customtkinter
 from CTkTable import *
 from tkinter import messagebox, simpledialog, scrolledtext, ttk
 import tkinter
-import basic_ctk_msgbox
+#import basic_ctk_msgbox
 
 import configparser
 import json
@@ -206,7 +206,7 @@ class Main:
     def Checkpoint_To_AddTableProduct(self, event=None):
         # Variales
         data = None
-        self.barcode = self.BarcodeE.get()
+        self.barcode = self.BarcodeE.get().strip()
         
         # Checking if the barcode is valid
         if self.barcode == "":
@@ -715,7 +715,7 @@ class Remove_Product:
 
     def Checkpoint_To_Info(self, event=None):
         # Variables
-        self.barcode = self.ProductE.get()
+        self.barcode = self.ProductE.get().strip()
 
         # Checking if the barcode is valid
         if self.barcode == "":
@@ -814,7 +814,7 @@ class Add_Product:
 
     def Checkpoint_To_Info(self, event=None):
         # Variables
-        self.barcode = self.ProductE.get()
+        self.barcode = self.ProductE.get().strip()
 
         # Checking if the barcode is valid
         if self.barcode == "":
