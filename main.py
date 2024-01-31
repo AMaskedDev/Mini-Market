@@ -81,6 +81,7 @@ class Main:
         # Variables
         self.total_products_cost = 0
         self.product_amount = 0
+        self.buying_list = {}
 
         # Start functions
         self.MainGUI()
@@ -103,7 +104,7 @@ class Main:
         self.ProductsTableFrame = customtkinter.CTkScrollableFrame(self.application)
         self.ProductsTableFrame.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
         
-        self.ProductsTable = CTkTable(self.ProductsTableFrame, row=0, column=0, values=[["Amount", "Product", "Cost", "Discount"], ], font=("calibri", 20))
+        self.ProductsTable = CTkTable(self.ProductsTableFrame, row=0, column=0, values=[["Amount", "Product", "Cost"], ], font=("calibri", 20))
         self.ProductsTable.pack(fill=tkinter.X)
 
         # Barcode input
@@ -117,7 +118,7 @@ class Main:
         self.CheckinB = customtkinter.CTkButton( self.application, text="Check in", font=("calibri", 18), width=245, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=5, command=self.Checkin)
         self.CheckinB.pack(pady=(10, 0))
 
-        self.ClearB = customtkinter.CTkButton(self.application, text="Clear", font=("calibri", 18), width=245, height=35, fg_color="#AB2525", hover_color="#942020", corner_radius=5, command=self.ClearTable)
+        self.ClearB = customtkinter.CTkButton(self.application, text="Clear", font=("calibri", 18), width=245, height=35, fg_color="#AB2525", hover_color="#942020", corner_radius=5, command=self.RefreshTable)
         self.ClearB.pack(pady=(3, 10))
 
         # Storage Management Buttons
@@ -149,20 +150,25 @@ class Main:
         if self.total_products_cost > 0:
             messagebox.showinfo("Check in", f"The total cost for every product is €{self.total_products_cost} \nThank you!")
 
-            # Reduce available products and reset the `runtime` variable
-            data = None
+            # Read existing product data
             with open("products.json", "r") as file:
                 data = json.load(file)
-                for product_data in data.values():
-                    product_data["available"] -= self.amount
-                    product_data["runtime"] = product_data["available"]
 
+            # Update available quantities based on the buying list
+            for entry in self.buying_list.values():
+                product = entry["product"]
+                amount = entry["amount"]
+
+                # Subtract the checked-in amount from the available quantity
+                data[product]["available"] -= amount
+
+            # Write the updated data back to the file
             with open("products.json", "w") as file:
-                json.dump(data, file)
+                json.dump(data, file, indent=2)
 
-            # Refreshing the table
             self.RefreshTable()
-            
+            self.ReconfigureRuntimes()
+
         else:
             messagebox.showinfo("Error", "Couldn't checkout. \nNo products to buy!")
 
@@ -197,10 +203,10 @@ class Main:
     def Checkpoint_To_AddTableProduct(self, event=None):
         # Variales
         data = None
-        barcode = self.BarcodeE.get()
+        self.barcode = self.BarcodeE.get()
         
         # Checking if the barcode is valid
-        if barcode == "":
+        if self.barcode == "":
             messagebox.showerror("Error", "Please use a valid product ID.\nError Code " + invalid)
             return
         
@@ -208,21 +214,21 @@ class Main:
         with open("products.json", "r") as file:
             data = json.load(file)
             
-        if not barcode in data:
+        if not self.barcode in data:
             messagebox.showerror("Error", "Product doesn't exist in storage.\nError Code " + existance)
             return        
-        
+
         self.AddTableProductGUI()
         
     def AddTableProductGUI(self):
         # Initializing the base window
-        self.application = customtkinter.CTk()
-        self.application.title("Mini Market")
-        self.application.geometry("550x300")
-        self.application.resizable(False, False)
+        self.ATPG = customtkinter.CTk()
+        self.ATPG.title("Mini Market")
+        self.ATPG.geometry("550x300")
+        self.ATPG.resizable(False, False)
 
         # Header Frame
-        self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=5)
+        self.Header = customtkinter.CTkFrame(self.ATPG, height=100, corner_radius=5)
         self.Header.pack(fill="x")
         
         # Clock
@@ -230,64 +236,72 @@ class Main:
         self.ClockL.pack(side="right", pady=(12, 12), padx=(0, 15))
 
         # Barcode input
-        self.ProductAmountE = customtkinter.CTkEntry(self.application, placeholder_text="Enter amounts", corner_radius=5, font=("calibri", 22), width=270, height=40)
+        self.ProductAmountE = customtkinter.CTkEntry(self.ATPG, placeholder_text="Enter amounts", corner_radius=5, font=("calibri", 22), width=270, height=40)
         self.ProductAmountE.pack(pady=(15, 0))
-        
-        self.DiscountAmountE = customtkinter.CTkEntry(self.application, placeholder_text="Enter discount", corner_radius=5, font=("calibri", 22), width=270, height=40)
-        self.DiscountAmountE.pack(pady=(10, 15))
 
         # Button
-        self.ContinueB = customtkinter.CTkButton(self.application, text="Add Product", font=("calibri", 18), width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2, command=lambda: self.AddTableProduct(amounts=self.ProductAmountE.get(), discount=self.DiscountAmountE.get()))
+        self.ContinueB = customtkinter.CTkButton(self.ATPG, text="Add Product", font=("calibri", 18), width=250, height=35, fg_color="#47A641", hover_color="#3E9338", corner_radius=2, command=lambda: self.AddTableProduct(self.ProductAmountE.get()))
         self.ContinueB.pack(pady=(10, 0))
-
-        self.ClearB = customtkinter.CTkButton(self.application, text="Clear", font=("calibri", 18), width=250, height=35, fg_color="#AB2525", hover_color="#942020", corner_radius=2, command=self.ClearTable)
-        self.ClearB.pack(pady=(5, 15))
     
         # Starting other methods
         self.Clock()    
                 
         # Binding commands / events to functions
-        self.ProductAmountE.bind("<Return>", lambda: self.AddTableProduct(amounts=self.ProductAmountE.get(), discount=self.DiscountAmountE.get()))
+        self.ProductAmountE.bind("<Return>", lambda: self.AddTableProduct(amounts=self.ProductAmountE.get()))
         
         # Application rendering loop
-        self.application.mainloop()
+        self.ATPG.mainloop()
     
-    def AddTableProduct(self, amounts, discount, event=None): 
+    def AddTableProduct(self, amounts, event=None): 
         # Temporary variables
-        barcode = self.BarcodeE.get()
         data = None
-        
-
+    
         # Empty and focus to the barcode input
         self.BarcodeE.delete(0, tkinter.END)
         self.BarcodeE.focus_set()
         
         # Converting the products amount to an integer
+        if amounts == "":
+            messagebox.showerror("Error", "Please input amounts \nError code: " + error)
+            return
+        if amounts is str:
+            messagebox.showerror("Error", "Don't use text \nError code: " + error)
+            return
+
         try:
             amounts = int(amounts)
-            discount = int(discount)
-        except ValueError:
-            messagebox.showerror("Error", "Invalid information \nError Code " + invalid)
+        except ValueError as e:
             return
 
         # Reading the json file
         with open("products.json", "r") as file:
             data = json.load(file)
+
+        # Checking if there are enough products
+        runtime = data[self.barcode]["runtime"]
+        if runtime - amounts <= 0 - 1:
+            messagebox.showerror("Error", "Invalid buying amount \nError code: " + error)
+            return
         
         # Getting information
-        data[barcode]["runtime"] -= amounts
-        product = data[barcode]["name"]
-        cost = data[barcode]["cost"]
+        data[self.barcode]["runtime"] -= amounts
+        product = data[self.barcode]["name"]
+        cost = data[self.barcode]["cost"]
+        
+        # Add the product and amount to the buying list
+        self.buying_list[len(self.buying_list) + 1] = {"product": self.barcode, "amount": amounts}
 
         # Adding product to table
-        self.total_products_cost += data[barcode]["cost"] * (amounts / discount)
-        self.ProductsTable.add_row(values=[f"x {amounts}", f"{product}", f"€{cost}", f"{discount}%"])
+        self.total_products_cost += data[self.barcode]["cost"] * amounts
+        self.ProductsTable.add_row(values=[f"x {amounts}", f"{product}", f"€{cost}"])
 
         # Update runtime in the file
         with open("products.json", "w") as file:
             json.dump(data, file)
-            file.close()
 
+        # Destroy the additional window
+        self.ATPG.destroy()
+        
     def ResetProducts(self):
         # Temporary variable
         data = None
@@ -302,6 +316,12 @@ class Main:
             json.dump(data, file)
             
     def Exit(self):
+        self.ReconfigureRuntimes()
+        
+        # Destroy root to exit
+        sys.exit(0)        
+
+    def ReconfigureRuntimes(self):
         # Temporary variable
         data = None
         
@@ -313,9 +333,6 @@ class Main:
 
         with open("products.json", "w") as file:
             json.dump(data, file)
-        
-        # Destroy root to exit
-        sys.exit(0)        
 
     def Clock(self):
         # Setting the format
@@ -374,6 +391,7 @@ class Settings:
         # Starting other methods
         self.Clock()
         self.Unneccessary()
+        self.GetSettings()
 
         # Application rendering loop
         self.application.mainloop()
@@ -420,28 +438,33 @@ class Settings:
         elif time_format == 0: self.TimeFormatC.deselect()
         
     def SaveSettings(self):
-        global settings_path
-        
+        global settings_path, darkethemed, time_format
+
         if 'Theme' not in config:
             # If 'Theme' section is not present, create it with default values
             config['Theme'] = {'darked-theme': True, 'time-format': True}
             with open(settings_path, 'w') as config_file:
                 config.write(config_file)
-        
+
         # Getting the value of the settings
         darkthemed = self.DarkThemedC.get()
         timeformat = self.TimeFormatC.get()
-        
-        # Set the updated value in the configuration
-        config.set('Theme', 'darked-theme', str(darkthemed))
-        config.set('Theme', 'time-format', str(timeformat))
-        
-        # Save the changes back to the configuration file
-        with open(settings_path, 'w') as config_file:
-            config.write(config_file)
-            
-        if messagebox.askyesno("Continue", "Are you sure this will restart the program, \nany client-side changes will be removed."):
-            Restart()
+
+        # Check if the values are different from the current state
+        if darkthemed != darkethemed or timeformat != time_format:
+            # Set the updated value in the configuration
+            config.set('Theme', 'darked-theme', str(darkthemed))
+            config.set('Theme', 'time-format', str(timeformat))
+
+            # Save the changes back to the configuration file
+            with open(settings_path, 'w') as config_file:
+                config.write(config_file)
+
+            if messagebox.askyesno("Continue", "Changes saved. Do you want to restart the program for the changes to take effect?"):
+                Restart()
+        else:
+            # Values are the same, no need to restart
+            messagebox.showinfo("No Changes", "The settings remain the same. No restart needed.")
              
     def Clock(self):
         # Setting the format
@@ -550,11 +573,14 @@ class View_Products:
                 product_cost = product_data.get("cost", "")
                 product_available = product_data.get("available", "")
 
-                self.ProductsTable.add_row(values=[f"{product_name}", f"{product_cost}", f"{product_available}"])
+                if product_available == 0:
+                    self.ProductsTable.add_row(values=[f"{product_name}", f"€{product_cost}", f"None"])
+                else:
+                    self.ProductsTable.add_row(values=[f"{product_name}", f"€{product_cost}", f"x {product_available}"])  
 
     def RefreshTable(self):
         self.ProductsTable.destroy()
-        self.ProductsTable = CTkTable(self.product_list_frame, row=0, column=0, values=[["Amount", "Product", "Cost"], ], font=("calibri", 20))
+        self.ProductsTable = CTkTable(self.product_list_frame, row=0, column=0, values=[["Product", "Cost", "Available"], ], font=("calibri", 20))
         self.ProductsTable.pack(fill=tkinter.X)
 
     def FindProduct(self):
@@ -906,3 +932,4 @@ class Add_Product:
 # Start of the project
 if __name__ == "__main__":
     Main()
+    
