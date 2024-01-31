@@ -3,6 +3,7 @@ import customtkinter
 from CTkTable import *
 from tkinter import messagebox, simpledialog, scrolledtext, ttk
 import tkinter
+import basic_ctk_msgbox
 
 import configparser
 import json
@@ -148,7 +149,7 @@ class Main:
 
     def Checkin(self):
         if self.total_products_cost > 0:
-            messagebox.showinfo("Check in", f"The total cost for every product is €{self.total_products_cost} \nThank you!")
+            basic_ctk_msgbox("Check in", f"The total cost for every product is €{self.total_products_cost} \nThank you!")
 
             # Read existing product data
             with open("products.json", "r") as file:
@@ -180,6 +181,8 @@ class Main:
 
         self.BarcodeE.delete(0, tkinter.END)
         self.BarcodeE.focus_set()
+        
+        self.ReconfigureRuntimes()
 
     def ClearTable(self):
         if self.total_products_cost < 0:
@@ -248,9 +251,11 @@ class Main:
                 
         # Binding commands / events to functions
         self.ProductAmountE.bind("<Return>", lambda: self.AddTableProduct(amounts=self.ProductAmountE.get()))
+        self.ATPG.bind('<Escape>', lambda x: self.ATPG.destroy())
         
         # Application rendering loop
         self.ATPG.mainloop()
+    
     
     def AddTableProduct(self, amounts, event=None): 
         # Temporary variables
@@ -389,9 +394,12 @@ class Settings:
         self.informationL.pack(side="bottom", pady=(0, 10))
         
         # Starting other methods
+        self.application.bind('<Escape>', lambda x: self.application.destroy())
+        
         self.Clock()
         self.Unneccessary()
         self.GetSettings()
+        
 
         # Application rendering loop
         self.application.mainloop()
@@ -521,7 +529,7 @@ class View_Products:
         self.product_list_frame = customtkinter.CTkScrollableFrame(self.application)
         self.product_list_frame.pack(pady=(25, 15), padx=(15, 15), fill=tkinter.BOTH, expand=True)
         
-        self.ProductsTable = CTkTable(self.product_list_frame, row=0, column=0, values=[["Product", "Cost", "Available"], ], font=("calibri", 20))
+        self.ProductsTable = CTkTable(self.product_list_frame, row=0, column=0, values=[["Barcode", "Product", "Cost", "Available"], ], font=("calibri", 20))
         self.ProductsTable.pack(fill=tkinter.X)
 
         # Storage Management
@@ -537,6 +545,9 @@ class View_Products:
         # Starting other methods
         self.AddProducts()
         self.Clock()
+        
+        self.application.bind('<Escape>', lambda x: self.application.destroy())
+    
 
         # Application rendering loop
         self.application.mainloop()
@@ -576,11 +587,11 @@ class View_Products:
                 if product_available == 0:
                     self.ProductsTable.add_row(values=[f"{product_name}", f"€{product_cost}", f"None"])
                 else:
-                    self.ProductsTable.add_row(values=[f"{product_name}", f"€{product_cost}", f"x {product_available}"])  
+                    self.ProductsTable.add_row(values=[f"{barcode}",f"{product_name}", f"€{product_cost}", f"x {product_available}"])  
 
     def RefreshTable(self):
         self.ProductsTable.destroy()
-        self.ProductsTable = CTkTable(self.product_list_frame, row=0, column=0, values=[["Product", "Cost", "Available"], ], font=("calibri", 20))
+        self.ProductsTable = CTkTable(self.product_list_frame, row=0, column=0, values=[["Barcode", "Product", "Cost", "Available"], ], font=("calibri", 20))
         self.ProductsTable.pack(fill=tkinter.X)
 
     def FindProduct(self):
@@ -606,6 +617,8 @@ class View_Products:
         self.ContinueB.pack(pady=(0, 4))
 
         self.ProductE.bind("<Return>", self.Checkpoint_To_Scan)
+        self.application.bind('<Escape>', lambda x: self.root.destroy())
+        
 
         # Starting other functions  
         self.ClockL()
@@ -644,7 +657,7 @@ class View_Products:
             product_cost = data[self.product_barcode]["cost"]
             product_available = data[self.product_barcode]["available"]
 
-            self.ProductsTable.add_row(values=[f"{product_name}", f"{product_cost}", f"{product_available}"])
+            self.ProductsTable.add_row(values=[f"{self.product_barcode}", f"{product_name}", f"{product_cost}", f"{product_available}"])
 
     def Clock(self):
         # Setting the format
@@ -691,6 +704,8 @@ class Remove_Product:
         self.ContinueB.pack(pady=(0, 4))
 
         self.ProductE.bind("<Return>", self.Checkpoint_To_Info)
+        self.root.bind('<Escape>', lambda x: self.root.destroy())
+        
         
         # Starting other functions
         self.Clock()
@@ -789,6 +804,7 @@ class Add_Product:
 
         # Binding commands / events to functions
         self.ProductE.bind("<Return>", self.Checkpoint_To_Info)
+        self.root.bind('<Escape>', lambda x: self.root.destroy())
         
         # Starting other functions
         self.Clock()
@@ -932,4 +948,3 @@ class Add_Product:
 # Start of the project
 if __name__ == "__main__":
     Main()
-    
