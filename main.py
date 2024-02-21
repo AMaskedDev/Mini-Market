@@ -3,7 +3,7 @@ import customtkinter
 from CTkTable import *
 from tkinter import messagebox, simpledialog, scrolledtext, ttk
 import tkinter
-#import basic_ctk_msgbox
+import basic_ctk_msgbox
 
 import configparser
 import json
@@ -96,10 +96,15 @@ class Main:
         # Header Frame
         self.Header = customtkinter.CTkFrame(self.application, height=100, corner_radius=5)
         self.Header.pack(fill="x")
+
+        self.DateFrame = customtkinter.CTkFrame(self.Header, height=65, corner_radius=0, fg_color='transparent')
+        self.DateFrame.pack(side="right", padx=(0, 15))
         
-        # Clock
-        self.ClockL = customtkinter.CTkLabel(self.Header, text="0:00", font=("calibri", 28))
-        self.ClockL.pack(side="right", pady=(12, 12), padx=(0, 15))
+        self.Date = customtkinter.CTkLabel(self.DateFrame, text="8/2/2024", font=("Noto Naksh Arabic", 20), corner_radius=0)
+        self.Date.pack(pady=(5, 0))
+        
+        self.Clock = customtkinter.CTkLabel(self.DateFrame, text="18:17", font=("Noto Naksh Arabic", 17), corner_radius=0)
+        self.Clock.pack(pady=(0, 0))
 
         # Buying treeview
         self.ProductsTableFrame = customtkinter.CTkScrollableFrame(self.application)
@@ -136,7 +141,7 @@ class Main:
         self.SettingsB.pack(side="right", padx=(0, 50))
 
         # Starting other methods
-        self.Clock()
+        # self.Clock()
 
         # Binding commands / events to functions
         self.BarcodeE.bind("<Return>", self.Checkpoint_To_AddTableProduct)
@@ -206,7 +211,7 @@ class Main:
     def Checkpoint_To_AddTableProduct(self, event=None):
         # Variales
         data = None
-        self.barcode = self.BarcodeE.get().strip()
+        self.barcode = self.BarcodeE.get()
         
         # Checking if the barcode is valid
         if self.barcode == "":
@@ -715,7 +720,7 @@ class Remove_Product:
 
     def Checkpoint_To_Info(self, event=None):
         # Variables
-        self.barcode = self.ProductE.get().strip()
+        self.barcode = self.ProductE.get()
 
         # Checking if the barcode is valid
         if self.barcode == "":
@@ -814,7 +819,7 @@ class Add_Product:
 
     def Checkpoint_To_Info(self, event=None):
         # Variables
-        self.barcode = self.ProductE.get().strip()
+        self.barcode = self.ProductE.get()
 
         # Checking if the barcode is valid
         if self.barcode == "":
